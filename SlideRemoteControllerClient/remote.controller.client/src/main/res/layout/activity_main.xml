@@ -8,9 +8,70 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="remote.controller.client.MainActivity">
 
-    <TextView
-        android:text="@string/hello_world"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <!--    <TextView
+            android:text="@string/hello_world"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />-->
+    <LinearLayout
+        android:id="@+id/fullscreenLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+            android:id="@+id/fullscreen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_weight="1"
+            android:background="@drawable/fullscreen_button"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:id="@+id/fullscreenout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_weight="1"
+            android:background="@drawable/fullscreen_button"
+            android:layout_centerHorizontal="true" />
+
+    </LinearLayout>
+    <!--    <Button
+            android:id="@+id/fullscreen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_weight="1"
+            android:background="@drawable/fullscreen_button"
+            android:layout_centerHorizontal="true" />-->
+
+    <LinearLayout
+        android:id="@+id/arrowLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fullscreenLayout"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/leftArrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="150dp"
+            android:layout_weight="1"
+            android:background="@drawable/left_button" />
+
+
+
+        <Button
+            android:id="@+id/rightArrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="150dp"
+            android:layout_weight="1"
+            android:background="@drawable/right_button" />
+
+    </LinearLayout>
 
 </RelativeLayout>
