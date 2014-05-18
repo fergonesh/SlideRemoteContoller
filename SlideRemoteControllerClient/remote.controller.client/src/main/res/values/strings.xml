@@ -7,7 +7,7 @@
 
     <!--con-->
         <string name="connection_help_info">
-        Wait for few seconds please and RemoteCotroller connected computer automatically.\n\n
+        Wait for few seconds please and RemoteController connected computer automatically.\n\n
         If you still see this message after a few seconds passed than you need to make a simple set up on your
         computer:\n\n
         1. Install and start RemoteControllerServer application\n\n

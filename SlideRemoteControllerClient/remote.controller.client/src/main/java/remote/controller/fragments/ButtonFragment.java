@@ -20,23 +20,21 @@ import java.net.InetAddress;
 import remote.controller.client.Log;
 import remote.controller.shared.Network;
 import remote.controller.shared.Network.ChatMessage;
-import remote.controller.shared.Network.UpdateNames;
-import remote.controller.client.MainActivity;
 import remote.controller.client.R;
-import remote.controller.shared.Network;
 
-@SuppressLint("NewApi")
+/**
+ * Created by Pavlo Shenhofer
+ * Button Fragment contain button.
+ */
 public class ButtonFragment extends Fragment {
-    private TextView lblHelp;
-    ChatMessage chatMessage = new ChatMessage();
-    private InetAddress address2;
-    Client tcpClient, udpClient;
+    private ChatMessage chatMessage = new ChatMessage();
+    private InetAddress address;
+    private Client tcpClient, udpClient;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.button_fragment, container, false);
-        //lblHelp = (TextView) v.findViewById(R.id.lbl_connection_help);
         tcpClient = new Client();
         tcpClient.start();
 
@@ -80,12 +78,9 @@ public class ButtonFragment extends Fragment {
         //END Click Button Listener
         return v;
     }
-/*    public void onClick(View v) {
 
-    }*/
 
     private void sendMsg() {
-        //boolean isNetwork = isNetworkAvailable();
         if (tcpClient != null) {
             tcpClient = new Client();
             tcpClient.start();
@@ -95,12 +90,12 @@ public class ButtonFragment extends Fragment {
             udpClient.start();
         }
 
-       if (address2 == null) {
-            address2 = udpClient.discoverHost(Network.UDP_PORT, 5000);
+       if (address == null) {
+            address = udpClient.discoverHost(Network.UDP_PORT, 5000);
         }
-        Log.d("Discovered server address:" + address2);
+        Log.d("Discovered server address:" + address);
         //   Log.info("Client was started...");
-          if (address2 != null) {
+          if (address != null) {
 
         Network.register(tcpClient);
 
@@ -128,7 +123,7 @@ public class ButtonFragment extends Fragment {
             public void run() {
                 try {
                     //  tcpClient.connect(5000, "localhost", Network.port);
-                    tcpClient.connect(5000, address2, Network.TCP_PORT);
+                    tcpClient.connect(5000, address, Network.TCP_PORT);
                     // Server communication after connection can go here, or in Listener#connected().
                 } catch (IOException ex) {
                     ex.printStackTrace();

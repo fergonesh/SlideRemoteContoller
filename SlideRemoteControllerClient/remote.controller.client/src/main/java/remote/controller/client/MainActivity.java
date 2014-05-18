@@ -37,13 +37,9 @@ import com.bugsense.trace.BugSenseHandler;
  */
 public class MainActivity extends FragmentActivity implements View.OnClickListener {
 
-    //@SuppressLint("NewApi")
     private FragmentManager manager = getSupportFragmentManager();
-    FragmentTransaction fTrans;
     private InetAddress address2;
-    Client tcpClient, udpClient;
-    ChatMessage chatMessage = new ChatMessage();
-    String name;
+    private Client tcpClient, udpClient;
     private ConnectionFragment conFragment;
     private ButtonFragment buttonFragment;
     //  EventSequence msgToSend;
@@ -68,14 +64,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         // Init needed fragments
         conFragment = new ConnectionFragment();
         buttonFragment = new ButtonFragment();
-
         manager.beginTransaction().add(R.id.pad, conFragment).commitAllowingStateLoss();
-
         changeFragment();
-
-
-
-
     }
 
     @SuppressLint("NewApi")
@@ -88,10 +78,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     if (isNetworkAvailable() && address2 != null) {
                         manager.beginTransaction().replace(R.id.pad, buttonFragment ).commit();
                     }
-
             }
         }.start();
-
     }
 
     @Override
@@ -118,64 +106,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     public void onClick(View v) {
 
     }
-
-
-
-    public void activate() {
-        tcpClient = new Client();
-        tcpClient.start();
-        udpClient = new Client();
-        udpClient.start();
-        new ConnectionThread().start();
-        Log.d("activated");
-    }
-
-    private class ConnectionThread extends Thread {
-        @Override
-        public void run() {
-            Network.register(tcpClient);
-            while (!false) {
-                /**
-                 * Discover server via WiFi
-                 */
-                InetAddress address = udpClient.discoverHost(Network.UDP_PORT, 5000);
-                Log.d("Discovered server address:" + address);
-
-                /**
-                 * Server discovered via WiFi? Try to use it.
-                 */
-                if (address != null) {
-                    try {
-                        // tcpClient.start();
-                        tcpClient.connect(5000, address, Network.TCP_PORT);
-                        // tcpClient.sendTCP(new Handshake().phone_TrustMe(accountName, accountType));
-                        //currConnType = ConnType.WIFI;
-                        Log.d("Connect via WiFI..");
-                        break;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
-
-/*    public void sendMessage(final Object msg) {
-        if (isConnected() && msgToSend != null) {
-            new Thread() {
-                public void run() {
-                    //trustedConnection.sendTCP(msg);
-                    tcpClient.sendTCP(msg);
-                }
-            }.start();
-
-        } else {
-            Log.e("Message is null and wasn't sent");
-        }
-    }*/
-
-
-
 
     @Override
     protected void onPause() {

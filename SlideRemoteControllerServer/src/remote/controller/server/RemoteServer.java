@@ -12,6 +12,10 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Created by Pavlo Shenhofer
+ * Server class for Remote Controller
+ */
 
 public class RemoteServer {
     Server server,udpServer;
