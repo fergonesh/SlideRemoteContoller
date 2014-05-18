@@ -1,10 +1,18 @@
 package remote.controller.client;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+/*import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;*/
+import android.support.v4.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,26 +24,36 @@ import com.esotericsoftware.kryonet.*;
 import java.io.IOException;
 import java.net.InetAddress;
 
+import remote.controller.fragments.ButtonFragment;
+import remote.controller.fragments.ConnectionFragment;
 import remote.controller.shared.Network;
 import remote.controller.shared.Network.ChatMessage;
 import remote.controller.shared.Network.UpdateNames;
+import com.bugsense.trace.BugSenseHandler;
 
 /**
  * Created by Pavlo Shenhofer
  * MainActivity Android Client program
  */
-public class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivity extends FragmentActivity implements View.OnClickListener {
 
-    InetAddress address2;
+    //@SuppressLint("NewApi")
+    private FragmentManager manager = getSupportFragmentManager();
+    FragmentTransaction fTrans;
+    private InetAddress address2;
     Client tcpClient, udpClient;
     ChatMessage chatMessage = new ChatMessage();
     String name;
+    private ConnectionFragment conFragment;
+    private ButtonFragment buttonFragment;
     //  EventSequence msgToSend;
     private boolean stopping; //flag for connection with server
 
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        BugSenseHandler.initAndStartSession(this, "c6dbac2d");
         Log.d("Making connection..");
 
         setContentView(R.layout.activity_main);
@@ -46,22 +64,33 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         udpClient = new Client();
         udpClient.start();
-        //   InetAddress address = tcpClient.discoverHost(Network.TCP_PORT, 5000);
-        //     Log.d("Discovered server address:" + address);
-        address2 = udpClient.discoverHost(Network.UDP_PORT, 5000);
 
-        Button fullscreenButton = (Button) findViewById(R.id.fullscreen);
-        fullscreenButton.setOnClickListener(this);
+        // Init needed fragments
+        conFragment = new ConnectionFragment();
+        buttonFragment = new ButtonFragment();
 
-        Button fullscreenOutButton = (Button) findViewById(R.id.fullscreenout);
-        fullscreenOutButton.setOnClickListener(this);
+        manager.beginTransaction().add(R.id.pad, conFragment).commitAllowingStateLoss();
 
-        Button leftButton = (Button) findViewById(R.id.leftArrow);
-        leftButton.setOnClickListener(this);
+        changeFragment();
 
-        Button rightButton = (Button) findViewById(R.id.rightArrow);
-        rightButton.setOnClickListener(this);
-        /**END Click Button Listener*/
+
+
+
+    }
+
+    @SuppressLint("NewApi")
+    public void changeFragment() {
+
+        new Thread("TryConnect") {
+            public void run() {
+
+                    address2 = udpClient.discoverHost(Network.UDP_PORT, 5000);
+                    if (isNetworkAvailable() && address2 != null) {
+                        manager.beginTransaction().replace(R.id.pad, buttonFragment ).commit();
+                    }
+
+            }
+        }.start();
 
     }
 
@@ -87,92 +116,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     // Button handling
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.fullscreen: {
-                chatMessage.text = "pressF5";
-                sendMsg();
 
-            }
-            break;
-
-            case R.id.fullscreenout: {
-                chatMessage.text = "ESC";
-                sendMsg();
-            }
-            break;
-
-            case R.id.rightArrow: {
-                chatMessage.text = "rightArrow";
-                sendMsg();
-            }
-            break;
-
-            case R.id.leftArrow: {
-                chatMessage.text = "leftArrow";
-                sendMsg();
-            }
-            break;
-
-            default:
-                break;
-        }
     }
 
-    public void sendMsg() {
-        boolean isNetwork = isNetworkAvailable();
-        if (tcpClient != null) {
-            tcpClient = new Client();
-            tcpClient.start();
-        }
-        if (udpClient != null) {
-            udpClient = new Client();
-            udpClient.start();
-        }
 
-        if (address2 == null) {
-            address2 = udpClient.discoverHost(Network.UDP_PORT, 5000);
-        }
-        Log.d("Discovered server address:" + address2);
-        //   Log.info("Client was started...");
-        if (address2 != null) {
-
-            Network.register(tcpClient);
-
-            tcpClient.addListener(new Listener() {
-                public void connected(Connection connection) {
-
-                    tcpClient.sendTCP(chatMessage);
-                    tcpClient.stop();
-
-                }
-
-
-            });
-
-
-            String input = "localhost";
-            if (input == null || input.trim().length() == 0) System.exit(1);
-            final String host = input;
-
-            input = "Test";
-            if (input == null || input.trim().length() == 0) System.exit(1);
-            name = input.trim();
-
-            new Thread("Connect") {
-                public void run() {
-                    try {
-                        //  tcpClient.connect(5000, "localhost", Network.port);
-                        tcpClient.connect(5000, address2, Network.TCP_PORT);
-                        // Server communication after connection can go here, or in Listener#connected().
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                        System.exit(1);
-                    }
-                }
-            }.start();
-
-        }
-    }
 
     public void activate() {
         tcpClient = new Client();
@@ -227,27 +174,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     }*/
 
-    private void startListener(final ChatMessage chm) {
-        tcpClient.addListener(new Listener() {
-            public void connected(Connection connection) {
-                tcpClient.sendTCP(chm);
-                //   tcpClient.stop();
 
-            }
-
-            public void received(Connection connection, Object object) {
-                if (object instanceof UpdateNames) {
-                    UpdateNames updateNames = (UpdateNames) object;
-                    return;
-                }
-
-                if (object instanceof ChatMessage) {
-                    ChatMessage chatMessage = (ChatMessage) object;
-                    return;
-                }
-            }
-        });
-    }
 
 
     @Override
